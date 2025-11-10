@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.8
   lottie: ^3.3.2
   persistent_bottom_nav_bar_v2: ^6.2.0
 
@@ -21,3 +22,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/lottie_animations/
+    - assets/img/

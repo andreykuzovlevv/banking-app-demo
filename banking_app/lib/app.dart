@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import 'screens/screens.dart';
-import 'widgets/widgets.dart';
+import 'widgets/anim_bottom_nav_bar.dart';
 
 class BankingApp extends StatelessWidget {
   const BankingApp({super.key});
