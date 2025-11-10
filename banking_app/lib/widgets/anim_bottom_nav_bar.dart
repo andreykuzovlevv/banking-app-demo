@@ -73,12 +73,15 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
             onTapCancel: () => setState(() => _pressedIndex = null),
             onTapUp: (_) => setState(() => _pressedIndex = null),
             onTap: () {
-              _playOnce(i); // play Lottie 0→1 only on tap
-              widget.navBarConfig.onItemSelected(i);
+              if (selected != i) {
+                _playOnce(i); // play Lottie 0→1 only on tap
+                widget.navBarConfig.onItemSelected(i);
+              }
             },
             child: Container(
               margin: EdgeInsets.only(bottom: bottomPadding),
               alignment: Alignment.center,
+              color: Colors.transparent,
               child: AnimatedScale(
                 scale: _pressedIndex == i ? 0.92 : 1.0,
                 duration: const Duration(milliseconds: 120),
@@ -114,10 +117,7 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        // Match icon dimming: 1.0 when selected, 0.5 otherwise.
-                        color: Colors.black.withValues(
-                          alpha: isSelected ? 1.0 : 0.5,
-                        ),
+                        color: isSelected ? Colors.white : Colors.white54,
                       ),
                     ),
                   ],

@@ -10,8 +10,11 @@ class BankingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Persistent Bottom Navigation Bar Demo',
+      theme: ThemeData.dark(),
       home: PersistentTabView(
+        backgroundColor: Colors.black,
         tabs: [
           PersistentTabConfig(
             screen: const DashboardScreen(),
@@ -24,7 +27,7 @@ class BankingApp extends StatelessWidget {
           ),
           PersistentTabConfig(
             screen: const CardScreen(),
-            item: ItemConfig(icon: SizedBox.shrink(), title: "Messages"),
+            item: ItemConfig(icon: SizedBox.shrink(), title: "Card"),
           ),
           PersistentTabConfig(
             screen: const AccountsScreen(),
@@ -39,10 +42,10 @@ class BankingApp extends StatelessWidget {
           navBarConfig: cfg,
           // Provide one asset per item, in order:
           lottieAssets: const [
-            'assets/lottie_animations/home.json',
-            'assets/lottie_animations/card.json',
-            'assets/lottie_animations/wallet.json',
-            'assets/lottie_animations/piggy.json',
+            'assets/lottie_animations/home_white.json',
+            'assets/lottie_animations/card_white.json',
+            'assets/lottie_animations/wallet_white.json',
+            'assets/lottie_animations/piggy_white.json',
           ],
         ),
       ),
