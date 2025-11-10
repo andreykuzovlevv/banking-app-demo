@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Wrap any widget to make it pressable with:
-///  - scale down on press
-///  - brightness increase on press
-///
-/// Tuning:
-///  - [pressedScale]: target scale while pressed (e.g. 0.94)
-///  - [brightnessDelta]: 0..1 additive brightness while pressed (e.g. 0.15)
-///  - [duration] & [curve]: press/release animation timing
 class Pressable extends StatefulWidget {
   const Pressable({
     super.key,
@@ -15,19 +7,21 @@ class Pressable extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.pressedScale = 0.94,
-    this.brightnessDelta = 0.15,
+    this.brightnessDelta = 0.3,
     this.duration = const Duration(milliseconds: 110),
     this.curve = Curves.easeOut,
     this.behavior = HitTestBehavior.opaque,
     this.enableHaptic = false,
     this.semanticLabel,
+    this.mask, // optional: provide a light mask if child is heavy/stateful
   });
 
   final Widget child;
+  final Widget? mask; // optional mask silhouette; defaults to child
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final double pressedScale;
-  final double brightnessDelta; // 0..1 (adds up to 255*delta to RGB)
+  final double brightnessDelta;
   final Duration duration;
   final Curve curve;
   final HitTestBehavior behavior;
@@ -38,8 +32,7 @@ class Pressable extends StatefulWidget {
   State<Pressable> createState() => _PressableState();
 }
 
-class _PressableState extends State<Pressable>
-    with SingleTickerProviderStateMixin {
+class _PressableState extends State<Pressable> {
   bool _pressed = false;
 
   void _setPressed(bool v) {
@@ -49,7 +42,6 @@ class _PressableState extends State<Pressable>
 
   @override
   Widget build(BuildContext context) {
-    // Press progress: 0 (idle) → 1 (pressed)
     final target = _pressed ? 1.0 : 0.0;
 
     return Semantics(
@@ -60,9 +52,8 @@ class _PressableState extends State<Pressable>
         onTapDown: (_) => _setPressed(true),
         onTapCancel: () => _setPressed(false),
         onTapUp: (_) => _setPressed(false),
-        onTap: () async {
+        onTap: () {
           if (widget.enableHaptic) {
-            // ignore: deprecated_member_use
             Feedback.forTap(context);
           }
           widget.onTap?.call();
@@ -72,21 +63,31 @@ class _PressableState extends State<Pressable>
           tween: Tween<double>(begin: 0, end: target),
           duration: widget.duration,
           curve: widget.curve,
-          builder: (context, t, child) {
+          child: widget.child,
+          builder: (context, t, baseChild) {
             final scale = _lerp(1.0, widget.pressedScale, t);
-            final brighten = _lerp(
-              0.0,
-              widget.brightnessDelta.clamp(0.0, 1.0),
-              t,
-            );
+            final overlayOpacity = (widget.brightnessDelta.clamp(0.0, 1.0)) * t;
 
             return Transform.scale(
               scale: scale,
               alignment: Alignment.center,
-              child: _BrightnessFilter(delta: brighten, child: child!),
+              child: Stack(
+                fit: StackFit.passthrough,
+                children: [
+                  baseChild!,
+                  if (overlayOpacity > 0)
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: _AlphaMaskedOverlay(
+                          opacity: overlayOpacity,
+                          mask: widget.mask ?? baseChild,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             );
           },
-          child: widget.child,
         ),
       ),
     );
@@ -95,30 +96,28 @@ class _PressableState extends State<Pressable>
 
 double _lerp(double a, double b, double t) => a + (b - a) * t;
 
-/// Simple additive brightness filter using a 5x5 color matrix.
-/// [delta] in 0..1 adds up to 255*delta to RGB channels.
-class _BrightnessFilter extends StatelessWidget {
-  const _BrightnessFilter({required this.delta, required this.child});
+/// Uses the [mask]'s alpha to show a solid white with [opacity].
+/// This is equivalent to AE "white solid above" with the masked area equal to the layer's silhouette.
+class _AlphaMaskedOverlay extends StatelessWidget {
+  const _AlphaMaskedOverlay({required this.opacity, required this.mask});
 
-  final double delta;
-  final Widget child;
+  final double opacity; // 0..1
+  final Widget mask;
 
   @override
   Widget build(BuildContext context) {
-    if (delta <= 0) return child;
-
-    final bias = (255.0 * delta).clamp(0.0, 255.0);
-    final List<double> matrix = <double>[
-      // R
-      1, 0, 0, 0, bias,
-      // G
-      0, 1, 0, 0, bias,
-      // B
-      0, 0, 1, 0, bias,
-      // A
-      0, 0, 0, 1, 0,
-    ];
-
-    return ColorFiltered(colorFilter: ColorFilter.matrix(matrix), child: child);
+    // We draw a solid white shader, then use the mask widget's alpha to keep only its silhouette.
+    return ShaderMask(
+      // Solid color shader; the rectangle is updated by layout.
+      shaderCallback: (rect) => const LinearGradient(
+        colors: [Colors.white, Colors.white],
+      ).createShader(rect),
+      blendMode: BlendMode.srcATop, // keep shader where mask (child) has alpha
+      child: Opacity(
+        opacity: opacity,
+        // This is the silhouette provider; prefer a lightweight equivalent if the real child is heavy.
+        child: mask,
+      ),
+    );
   }
 }

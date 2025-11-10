@@ -13,6 +13,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           SizedBox(height: topPadding),
           AccountCard(),
+          SizedBox(height: 10),
           OverviewSection(),
         ],
       ),

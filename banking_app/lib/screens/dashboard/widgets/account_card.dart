@@ -8,12 +8,23 @@ class AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10),
-      padding: EdgeInsets.all(10),
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white10,
         borderRadius: BorderRadius.circular(38),
+        gradient: RadialGradient(
+          colors: [
+            const Color.fromARGB(255, 200, 209, 255),
+            const Color.fromARGB(255, 58, 87, 253),
+            theme.cardColor,
+          ],
+          radius: 2,
+          center: AlignmentGeometry.xy(0.8, 2.2),
+          stops: [0.25, 0.4, 0.65],
+          focal: Alignment(0.8, 2.2),
+        ),
       ),
       child: Column(
         children: [
@@ -31,6 +42,7 @@ class AccountCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   spacing: 6,
@@ -42,6 +54,7 @@ class AccountCard extends StatelessWidget {
                 UserBalance(),
                 SizedBox(height: 30),
                 AccountOperations(),
+                SizedBox(height: 10),
               ],
             ),
           ),
@@ -63,7 +76,7 @@ class Avatar extends StatelessWidget {
           child: CircleAvatar(
             radius: 30,
             foregroundImage: AssetImage('assets/img/Butter_Dog.webp'),
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.deepOrangeAccent,
           ),
         ),
         Text('Butter Dog'),
@@ -77,7 +90,7 @@ class UserBalance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Text(r'$12 345 678,90', style: TextStyle(fontSize: 40));
   }
 }
 
@@ -86,6 +99,29 @@ class AccountOperations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SizedBox(
+          width: 72,
+          child: CircleIconButton(
+            icon: CupertinoIcons.add,
+            label: 'Add saving',
+          ),
+        ),
+        SizedBox(
+          width: 72,
+          child: CircleIconButton(icon: CupertinoIcons.add, label: 'Withdraw'),
+        ),
+        SizedBox(
+          width: 72,
+          child: CircleIconButton(icon: CupertinoIcons.add, label: 'Top up'),
+        ),
+        SizedBox(
+          width: 72,
+          child: CircleIconButton(icon: CupertinoIcons.add, label: 'Exchange'),
+        ),
+      ],
+    );
   }
 }
