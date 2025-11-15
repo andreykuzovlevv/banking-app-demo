@@ -719,38 +719,35 @@ class _SegmentedControlState<T extends Object> extends State<OverviewToolbar<T>>
       ...actionChildren,
     ];
 
-    return UnconstrainedBox(
-      constrainedAxis: Axis.horizontal,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedBuilder(
-            animation: thumbScaleController,
-            builder: (BuildContext context, Widget? child) {
-              return _SegmentedControlRenderWidget<T>(
-                key: segmentedControlRenderWidgetKey,
-                highlightedIndex: highlightedIndex,
-                thumbColor: CupertinoDynamicColor.resolve(
-                  widget.thumbColor,
-                  context,
-                ),
-                backgroundColor: widget.backgroundColor,
-                thumbScale: thumbScaleAnimation.value,
-                proportionalWidth: widget.proportionalWidth,
-                state: this,
-                segmentChildCount: segmentChildren.length,
-                children: renderChildren,
-              );
-            },
-          ),
-          SizedBox(width: 10),
-          ToggleModesButton(
-            backgroundColor: widget.backgroundColor,
-            size: _kMinSegmentedControlHeight,
-            onModeChanged: _handleModeChanged,
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedBuilder(
+          animation: thumbScaleController,
+          builder: (BuildContext context, Widget? child) {
+            return _SegmentedControlRenderWidget<T>(
+              key: segmentedControlRenderWidgetKey,
+              highlightedIndex: highlightedIndex,
+              thumbColor: CupertinoDynamicColor.resolve(
+                widget.thumbColor,
+                context,
+              ),
+              backgroundColor: widget.backgroundColor,
+              thumbScale: thumbScaleAnimation.value,
+              proportionalWidth: widget.proportionalWidth,
+              state: this,
+              segmentChildCount: segmentChildren.length,
+              children: renderChildren,
+            );
+          },
+        ),
+        SizedBox(width: 10),
+        ToggleModesButton(
+          backgroundColor: widget.backgroundColor,
+          size: _kMinSegmentedControlHeight,
+          onModeChanged: _handleModeChanged,
+        ),
+      ],
     );
   }
 }

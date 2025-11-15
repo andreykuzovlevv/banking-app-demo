@@ -1,3 +1,4 @@
+import 'package:banking_app/styles/styles.dart';
 import 'package:banking_app/widgets/circle_icon_button.dart';
 import 'package:banking_app/widgets/pressable.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,8 +11,8 @@ class AccountCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      padding: EdgeInsets.all(8),
+      margin: Styles.horizontalBodyPadding,
+      padding: Styles.cardPadding,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(38),
         gradient: RadialGradient(

@@ -34,16 +34,22 @@ abstract class Styles {
     fontSize: 20.0,
   );
 
+  static const double spaceBetween = 8;
+
+  static const gap = SizedBox(height: spaceBetween, width: spaceBetween);
+
   // padding
   static const bodyPadding = EdgeInsets.symmetric(
-    vertical: 16.0,
-    horizontal: 16.0,
+    vertical: spaceBetween,
+    horizontal: spaceBetween,
   );
   static const verticalBodyPadding = EdgeInsets.symmetric(vertical: 16.0);
-  static const horizontalBodyPadding = EdgeInsets.symmetric(horizontal: 16.0);
-  static const sectionBottomPadding = EdgeInsets.only(bottom: 16.0);
+  static const horizontalBodyPadding = EdgeInsets.symmetric(
+    horizontal: spaceBetween,
+  );
+  static const sectionBottomPadding = EdgeInsets.only(bottom: spaceBetween);
   static const sectionTopPadding = EdgeInsets.only(top: 16.0);
-  static const bodySectionPadding = EdgeInsets.all(16.0);
+  static const cardPadding = EdgeInsets.all(spaceBetween);
 
   /// Horizontal and bottom padding for the body section.
   static const bodySectionBottomPadding = EdgeInsets.only(

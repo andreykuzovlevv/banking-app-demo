@@ -1,5 +1,6 @@
 import 'package:banking_app/screens/dashboard/widgets/overview_toolbar.dart';
 import 'package:banking_app/screens/dashboard/widgets/toggle_modes_button.dart';
+import 'package:banking_app/styles/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -28,8 +29,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           SizedBox(height: topPadding),
           AccountCard(),
-          SizedBox(height: 20),
+          Styles.gap,
           OverviewToolbar<Currency>(
+            padding: Styles.horizontalBodyPadding,
             backgroundColor: const Color.fromRGBO(55, 55, 55, 1),
             thumbColor: const Color.fromARGB(255, 110, 110, 110),
             // This represents the currently selected segmented control.
@@ -43,15 +45,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               }
             },
             children: const <Currency, Widget>{
-              Currency.card: Text('Midnight'),
-              Currency.crypto: Text('Viridian'),
-              Currency.fiat: Text('Cerulean'),
+              Currency.crypto: Text('Crypto'),
+              Currency.fiat: Text('Fiat'),
+              Currency.card: Text('Card'),
+              Currency.savings: Text('Savings'),
             },
             actionOne: Text('Card analysis >'),
-            actionTwo: Icon(
-              CupertinoIcons.gear_solid,
-              color: Color(0xffffffff),
-            ),
+            actionTwo: Icon(CupertinoIcons.gear, color: Color(0xffffffff)),
             onActionOne: () => print('Action One ACTIVATED'),
             onActionTwo: () => print('Action Two ACTIVATED'),
           ),
