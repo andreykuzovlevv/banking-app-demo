@@ -18,7 +18,7 @@ class AnimatedBottomNavBar extends StatefulWidget {
 
 class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
     with TickerProviderStateMixin {
-  late final List<AnimationController> _lottieControllers;
+  List<AnimationController> _lottieControllers = [];
   int? _pressedIndex; // for press scale animation
 
   @override
@@ -44,14 +44,9 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
 
   Future<void> _playOnce(int index) async {
     final c = _lottieControllers[index];
-    // If onLoaded hasn’t run yet, fall back to a sensible duration.
-    final duration = c.duration ?? const Duration(milliseconds: 900);
-    try {
-      await c.animateTo(1.0, duration: duration);
-    } finally {
-      // Reset to 0 so next tap starts from the first frame.
-      c.value = 0.0;
-    }
+
+    await c.animateTo(1.0);
+    c.value = 0.0;
   }
 
   @override
@@ -68,7 +63,6 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
           final isSelected = i == selected;
 
           return GestureDetector(
-            behavior: HitTestBehavior.opaque,
             onTapDown: (_) => setState(() => _pressedIndex = i),
             onTapCancel: () => setState(() => _pressedIndex = null),
             onTapUp: (_) => setState(() => _pressedIndex = null),
@@ -79,8 +73,8 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
               }
             },
             child: Container(
+              width: 60,
               margin: EdgeInsets.only(bottom: bottomPadding),
-              alignment: Alignment.center,
               color: Colors.transparent,
               child: AnimatedScale(
                 scale: _pressedIndex == i ? 0.92 : 1.0,
@@ -91,7 +85,7 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
                   children: [
                     // Icon with per-state opacity
                     Opacity(
-                      opacity: isSelected ? 1.0 : 0.5,
+                      opacity: isSelected ? 1.0 : 0.54,
                       child: SizedBox(
                         height: 30,
                         width: 30,
@@ -113,10 +107,9 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
                     Text(
                       item.title ?? '',
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: isSelected ? Colors.white : Colors.white54,
                       ),
                     ),
