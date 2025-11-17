@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   int overviewIndex = 0;
 
-  static const double _slide = 50;
+  static const double _slide = 200;
 
   late final AnimationController overviewTransitionController =
       AnimationController(
@@ -56,27 +56,37 @@ class _DashboardScreenState extends State<DashboardScreen>
       );
 
   late final opacityOut = overviewTransitionController
-      .drive(CurveTween(curve: const Interval(0.0, 0.4, curve: Curves.easeOut)))
+      .drive(
+        CurveTween(curve: const Interval(0.0, 0.4, curve: Curves.easeInOut)),
+      )
       .drive(Tween<double>(begin: 1.0, end: 0.0));
 
   late final offsetYOut = overviewTransitionController
-      .drive(CurveTween(curve: const Interval(0.0, 0.4, curve: Curves.easeOut)))
+      .drive(
+        CurveTween(curve: const Interval(0.0, 0.4, curve: Curves.easeInCubic)),
+      )
       .drive(Tween<double>(begin: 0.0, end: _slide));
 
   late final opacityInPanel = overviewTransitionController
-      .drive(CurveTween(curve: const Interval(0.4, 0.8, curve: Curves.easeOut)))
+      .drive(
+        CurveTween(curve: const Interval(0.4, 0.8, curve: Curves.easeInOut)),
+      )
       .drive(Tween<double>(begin: 0.0, end: 1.0));
 
   late final opacityInCards = overviewTransitionController
-      .drive(CurveTween(curve: const Interval(0.5, 1, curve: Curves.easeOut)))
+      .drive(CurveTween(curve: const Interval(0.5, 1, curve: Curves.easeInOut)))
       .drive(Tween<double>(begin: 0.0, end: 1.0));
 
   late final offsetYInPanel = overviewTransitionController
-      .drive(CurveTween(curve: const Interval(0.4, 0.8, curve: Curves.easeOut)))
+      .drive(
+        CurveTween(curve: const Interval(0.4, 0.8, curve: Curves.easeOutCubic)),
+      )
       .drive(Tween<double>(begin: _slide, end: 0.0));
 
   late final offsetYInCards = overviewTransitionController
-      .drive(CurveTween(curve: const Interval(0.5, 1, curve: Curves.easeOut)))
+      .drive(
+        CurveTween(curve: const Interval(0.5, 1, curve: Curves.easeOutCubic)),
+      )
       .drive(Tween<double>(begin: _slide, end: 0.0));
 
   @override
@@ -208,14 +218,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                 cardsOffsetY = 0.0;
               } else if (isFadeOutPhase) {
                 panelOpacity = opacityOut.value;
-                panelOffsetY = offsetYOut.value.toDouble();
+                panelOffsetY = offsetYOut.value;
                 cardsOpacity = opacityOut.value;
-                cardsOffsetY = offsetYOut.value.toDouble();
+                cardsOffsetY = offsetYOut.value;
               } else {
                 panelOpacity = opacityInPanel.value;
-                panelOffsetY = offsetYInPanel.value.toDouble();
+                panelOffsetY = offsetYInPanel.value;
                 cardsOpacity = opacityInCards.value;
-                cardsOffsetY = offsetYInCards.value.toDouble();
+                cardsOffsetY = offsetYInCards.value;
               }
 
               return _OverviewAnimatedColumn(
@@ -259,24 +269,27 @@ class _OverviewAnimatedColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Opacity(
-          opacity: panelOpacity,
-          child: Transform.translate(
-            offset: Offset(0, panelOffsetY),
-            child: _buildPanel(),
+    return Padding(
+      padding: Styles.horizontalBodyPadding,
+      child: Column(
+        children: [
+          Opacity(
+            opacity: panelOpacity,
+            child: Transform.translate(
+              offset: Offset(0, panelOffsetY),
+              child: _buildPanel(),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Opacity(
-          opacity: cardsOpacity,
-          child: Transform.translate(
-            offset: Offset(0, cardsOffsetY),
-            child: const StackCards(),
+          const SizedBox(height: 8),
+          Opacity(
+            opacity: cardsOpacity,
+            child: Transform.translate(
+              offset: Offset(0, cardsOffsetY),
+              child: const StackCards(),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

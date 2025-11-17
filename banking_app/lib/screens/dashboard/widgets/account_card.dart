@@ -13,7 +13,7 @@ class AccountCard extends StatelessWidget {
       margin: Styles.horizontalBodyPadding,
       padding: Styles.cardPadding,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(36),
+        borderRadius: BorderRadius.circular(38),
         gradient: RadialGradient(
           colors: [
             const Color.fromARGB(255, 200, 209, 255),
