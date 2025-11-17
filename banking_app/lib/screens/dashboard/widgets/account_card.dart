@@ -13,7 +13,7 @@ class AccountCard extends StatelessWidget {
       margin: Styles.horizontalBodyPadding,
       padding: Styles.cardPadding,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(38),
+        borderRadius: BorderRadius.circular(36),
         gradient: RadialGradient(
           colors: [
             const Color.fromARGB(255, 200, 209, 255),
@@ -103,7 +103,7 @@ class AccountOperations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         SizedBox(
           width: 72,

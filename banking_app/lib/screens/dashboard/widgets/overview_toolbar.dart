@@ -257,6 +257,7 @@ class OverviewToolbar<T extends Object> extends StatefulWidget {
     this.padding = _kHorizontalItemPadding,
     this.backgroundColor = CupertinoColors.tertiarySystemFill,
     this.proportionalWidth = false,
+    this.onModeChanged,
   }) : assert(children.length >= 2),
        assert(
          groupValue == null || children.keys.contains(groupValue),
@@ -322,6 +323,8 @@ class OverviewToolbar<T extends Object> extends StatefulWidget {
   ///
   /// Defaults to false.
   final bool proportionalWidth;
+
+  final ValueChanged<ViewMode>? onModeChanged;
 
   /// The color used to paint the interior of the thumb that appears behind the
   /// currently selected item.
@@ -503,6 +506,8 @@ class _SegmentedControlState<T extends Object> extends State<OverviewToolbar<T>>
     setState(() {
       viewMode = mode;
     });
+
+    widget.onModeChanged?.call(mode);
 
     if (mode == ViewMode.activity) {
       transitionController.forward();
