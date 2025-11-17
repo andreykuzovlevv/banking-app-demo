@@ -5,6 +5,11 @@ class AppColors {
   // prevents instantiation and extension.
   AppColors._();
 
+  static const Color background = Color(0x00000000);
+  static const Color surface = Color(0xFF1c1c1c);
+  static const Color onBackground = Color.fromARGB(255, 37, 37, 37);
+  static const Color highlighted = Color.fromARGB(255, 60, 60, 60);
+
   // primary: blue
   static const MaterialColor primary =
       MaterialColor(_primaryPrimaryValue, <int, Color>{

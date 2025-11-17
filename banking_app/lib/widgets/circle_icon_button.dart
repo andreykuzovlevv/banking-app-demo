@@ -5,13 +5,17 @@ class CircleIconButton extends StatelessWidget {
   const CircleIconButton({
     super.key,
     required this.icon,
+    this.iconSize = 40,
     this.label,
+    this.backgroundColor = Colors.white24,
     this.showBadge = false,
     this.onPressed,
   });
 
   final IconData icon;
+  final double iconSize;
   final String? label;
+  final Color backgroundColor;
   final bool showBadge;
   final VoidCallback? onPressed;
 
@@ -29,10 +33,10 @@ class CircleIconButton extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: backgroundColor,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: Colors.white, size: 40),
+                child: Icon(icon, color: Colors.white, size: iconSize),
               ),
 
               // Red badge (optional)

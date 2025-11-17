@@ -6,7 +6,7 @@ class Pressable extends StatefulWidget {
     required this.child,
     this.onTap,
     this.onLongPress,
-    this.pressedScale = 0.84,
+    this.pressedScale = 0.9,
     this.brightnessDelta = 0.3, // 0..1
     this.duration = const Duration(milliseconds: 110),
     this.curve = Curves.easeOut,

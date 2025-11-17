@@ -31,9 +31,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           AccountCard(),
           Styles.gap,
           OverviewToolbar<Currency>(
+            proportionalWidth: false,
             padding: Styles.horizontalBodyPadding,
-            backgroundColor: const Color.fromRGBO(55, 55, 55, 1),
-            thumbColor: const Color.fromARGB(255, 110, 110, 110),
+            backgroundColor: AppColors.onBackground,
+            thumbColor: AppColors.highlighted,
             // This represents the currently selected segmented control.
             groupValue: currencyView,
             // Callback that sets the selected segmented control.
@@ -50,7 +51,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Currency.card: Text('Card'),
               Currency.savings: Text('Savings'),
             },
-            actionOne: Text('Card analysis >'),
+            actionOne: Row(
+              spacing: 6,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Card analysis'),
+                Icon(CupertinoIcons.chevron_down, size: 16),
+              ],
+            ),
             actionTwo: Icon(CupertinoIcons.gear, color: Color(0xffffffff)),
             onActionOne: () => print('Action One ACTIVATED'),
             onActionTwo: () => print('Action Two ACTIVATED'),

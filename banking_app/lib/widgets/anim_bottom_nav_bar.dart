@@ -87,8 +87,8 @@ class _AnimatedBottomNavBarState extends State<AnimatedBottomNavBar>
                     Opacity(
                       opacity: isSelected ? 1.0 : 0.54,
                       child: SizedBox(
-                        height: 30,
-                        width: 30,
+                        height: 32,
+                        width: 32,
                         child: Lottie.asset(
                           widget.lottieAssets[i],
                           controller: _lottieControllers[i],

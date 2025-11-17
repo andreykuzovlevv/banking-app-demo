@@ -20,12 +20,6 @@ const EdgeInsetsGeometry _kHorizontalItemPadding = EdgeInsets.symmetric(
 // The corner radius of the segmented control.
 const Radius _kCornerRadius = Radius.circular(100);
 
-// The corner radius of the thumb.
-const Radius _kThumbRadius = Radius.circular(100);
-// The amount of space by which to expand the thumb from the size of the currently
-// selected child.
-const EdgeInsets _kThumbInsets = EdgeInsets.symmetric(horizontal: 1);
-
 // Minimum height of the segmented control.
 const double _kMinSegmentedControlHeight = 60.0;
 
@@ -36,11 +30,11 @@ const CupertinoDynamicColor _kThumbColor = CupertinoDynamicColor.withBrightness(
 
 // The minimum scale factor of the thumb, when being pressed on for a sufficient
 // amount of time.
-const double _kMinThumbScale = 0.85;
+const double _kMinThumbScale = 0.9;
 
 // The minimum horizontal distance between the edges of the separator and the
 // closest child.
-const double _kSegmentMinPadding = 14;
+const double _kSegmentMinPadding = 12;
 
 // The threshold value used in hasDraggedTooFar, for checking against the square
 // L2 distance from the location of the current drag pointer, to the closest
@@ -53,7 +47,7 @@ const double _kTouchYDistanceThreshold = 50.0 * 50.0;
 // segment and it starts to fadeout.
 //
 // Inspected from iOS 17.5 simulator.
-const double _kContentPressedMinOpacity = 0.2;
+const double _kContentPressedMinOpacity = 0.7;
 
 // Inspected from iOS 17.5 simulator.
 const double _kFontSize = 15.0;
@@ -719,35 +713,39 @@ class _SegmentedControlState<T extends Object> extends State<OverviewToolbar<T>>
       ...actionChildren,
     ];
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedBuilder(
-          animation: thumbScaleController,
-          builder: (BuildContext context, Widget? child) {
-            return _SegmentedControlRenderWidget<T>(
-              key: segmentedControlRenderWidgetKey,
-              highlightedIndex: highlightedIndex,
-              thumbColor: CupertinoDynamicColor.resolve(
-                widget.thumbColor,
-                context,
-              ),
-              backgroundColor: widget.backgroundColor,
-              thumbScale: thumbScaleAnimation.value,
-              proportionalWidth: widget.proportionalWidth,
-              state: this,
-              segmentChildCount: segmentChildren.length,
-              children: renderChildren,
-            );
-          },
-        ),
-        SizedBox(width: 10),
-        ToggleModesButton(
-          backgroundColor: widget.backgroundColor,
-          size: _kMinSegmentedControlHeight,
-          onModeChanged: _handleModeChanged,
-        ),
-      ],
+    return Padding(
+      padding: widget.padding,
+      child: Row(
+        children: [
+          Expanded(
+            child: AnimatedBuilder(
+              animation: thumbScaleController,
+              builder: (BuildContext context, Widget? child) {
+                return _SegmentedControlRenderWidget<T>(
+                  key: segmentedControlRenderWidgetKey,
+                  highlightedIndex: highlightedIndex,
+                  thumbColor: CupertinoDynamicColor.resolve(
+                    widget.thumbColor,
+                    context,
+                  ),
+                  backgroundColor: widget.backgroundColor,
+                  thumbScale: thumbScaleAnimation.value,
+                  proportionalWidth: widget.proportionalWidth,
+                  state: this,
+                  segmentChildCount: segmentChildren.length,
+                  children: renderChildren,
+                );
+              },
+            ),
+          ),
+          SizedBox(width: 8),
+          ToggleModesButton(
+            backgroundColor: widget.backgroundColor,
+            size: _kMinSegmentedControlHeight,
+            onModeChanged: _handleModeChanged,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1081,18 +1079,6 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
     }
   }
 
-  double _getMaxChildWidth(BoxConstraints constraints) {
-    final int count = math.max(segmentChildCount, 1);
-    double childWidth = constraints.minWidth / count;
-    for (final RenderBox child in _segmentChildren()) {
-      childWidth = math.max(
-        childWidth,
-        child.getMaxIntrinsicWidth(double.infinity) + 2 * _kSegmentMinPadding,
-      );
-    }
-    return math.min(childWidth, constraints.maxWidth / count);
-  }
-
   double _getMaxSegmentChildHeight(double childWidth) {
     double maxHeight = _kMinSegmentedControlHeight;
     for (final RenderBox child in _segmentChildren()) {
@@ -1106,11 +1092,18 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
     if (segmentChildCount == 0) {
       return <double>[];
     }
+
+    // Use all available width and distribute it across segments
+    final double availableWidth = constraints.maxWidth.isFinite
+        ? constraints.maxWidth
+        : constraints.minWidth;
+    final double segmentWidth = availableWidth / segmentChildCount;
+
     if (!proportionalWidth) {
-      final double maxChildWidth = _getMaxChildWidth(constraints);
-      return List<double>.filled(segmentChildCount, maxChildWidth);
+      return List<double>.filled(segmentChildCount, segmentWidth);
     }
 
+    // For proportional width, calculate intrinsic widths first
     final List<double> segmentWidths = <double>[];
     for (final RenderBox child in _segmentChildren()) {
       final double childWidth =
@@ -1118,31 +1111,32 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
       segmentWidths.add(childWidth);
     }
 
-    final double totalWidth = _sumList(segmentWidths);
+    final double totalIntrinsicWidth = _sumList(segmentWidths);
 
-    // If the sum of the children's width is larger than the allowed max width,
-    // each segment width should scale down until the overall size can fit in
-    // the parent constraints; similarly, if the sum of the children's width is
-    // smaller than the allowed min width, each segment width should scale up
-    // until the overall size can fit in the parent constraints.
-    final double allowedMaxWidth = constraints.maxWidth;
-    final double allowedMinWidth = constraints.minWidth;
-
-    final double scale =
-        clampDouble(totalWidth, allowedMinWidth, allowedMaxWidth) / totalWidth;
-    if (scale != 1) {
+    // Scale to fit available width
+    if (totalIntrinsicWidth > 0) {
+      final double scale = availableWidth / totalIntrinsicWidth;
       for (int i = 0; i < segmentWidths.length; i++) {
         segmentWidths[i] = segmentWidths[i] * scale;
       }
+    } else {
+      // Fallback to equal distribution
+      return List<double>.filled(segmentChildCount, segmentWidth);
     }
+
     return segmentWidths;
   }
 
   Size _computeOverallSize(BoxConstraints constraints) {
     final double maxChildHeight = _getMaxSegmentChildHeight(
-      constraints.maxWidth,
+      constraints.maxWidth.isFinite
+          ? constraints.maxWidth
+          : constraints.minWidth,
     );
-    final double totalWidth = _sumList(_getSegmentChildWidths(constraints));
+    // Use all available width
+    final double totalWidth = constraints.maxWidth.isFinite
+        ? constraints.maxWidth
+        : constraints.minWidth;
     return constraints.constrain(Size(totalWidth, maxChildHeight));
   }
 
@@ -1152,7 +1146,11 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
     TextBaseline baseline,
   ) {
     final List<double> segmentWidths = _getSegmentChildWidths(constraints);
-    final double childHeight = _getMaxSegmentChildHeight(constraints.maxWidth);
+    final double childHeight = _getMaxSegmentChildHeight(
+      constraints.maxWidth.isFinite
+          ? constraints.maxWidth
+          : constraints.minWidth,
+    );
 
     int index = 0;
     BaselineOffset baselineOffset = BaselineOffset.noBaseline;
@@ -1202,37 +1200,75 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
     size = _computeOverallSize(constraints);
 
     if (_actionChildCount > 0) {
-      double left = 0;
-      double right = size.width;
-      while (child != null) {
-        final RenderBox? nextChild = childAfter(child);
-        final bool isLastAction = nextChild == null;
-        final double desiredWidth = math.min(
-          child.getMaxIntrinsicWidth(double.infinity) + 2 * _kSegmentMinPadding,
-          size.width,
+      // Position actions at leftmost and rightmost edges
+      final List<RenderBox> actionList = _actionChildren().toList();
+      if (actionList.length == 2) {
+        // First action at leftmost (0)
+        final RenderBox firstAction = actionList[0];
+        final double firstActionWidth = math.min(
+          firstAction.getMaxIntrinsicWidth(double.infinity) +
+              2 * _kSegmentMinPadding,
+          size.width / 2, // Don't exceed half width
         );
-        final double remainingWidth = math.max(right - left, 0);
-        final double actionWidth = math.min(desiredWidth, remainingWidth);
-        final BoxConstraints actionConstraints = BoxConstraints.tight(
-          Size(actionWidth, size.height),
+        final BoxConstraints firstActionConstraints = BoxConstraints.tight(
+          Size(firstActionWidth, size.height),
         );
-        child.layout(actionConstraints, parentUsesSize: true);
-        final _SegmentedControlContainerBoxParentData childParentData =
-            child.parentData! as _SegmentedControlContainerBoxParentData;
-        if (isLastAction) {
-          // For the last action, center it within a square area at the right edge
-          final double squareSize = size.height;
-          // Center the action child within the square: square center - actionWidth/2
-          final double centeredLeft = math.max(
-            left,
-            size.width - squareSize / 2 - actionWidth / 2,
+        firstAction.layout(firstActionConstraints, parentUsesSize: true);
+        final _SegmentedControlContainerBoxParentData firstActionParentData =
+            firstAction.parentData! as _SegmentedControlContainerBoxParentData;
+        firstActionParentData.offset = Offset(0, 0);
+
+        // Last action at rightmost, centered in the square background
+        final RenderBox lastAction = actionList[1];
+        final double lastActionWidth = math.min(
+          lastAction.getMaxIntrinsicWidth(double.infinity) +
+              2 * _kSegmentMinPadding,
+          size.width / 2, // Don't exceed half width
+        );
+        final BoxConstraints lastActionConstraints = BoxConstraints.tight(
+          Size(lastActionWidth, size.height),
+        );
+        lastAction.layout(lastActionConstraints, parentUsesSize: true);
+        final _SegmentedControlContainerBoxParentData lastActionParentData =
+            lastAction.parentData! as _SegmentedControlContainerBoxParentData;
+        // Center the action within the square background at the right edge
+        final double squareSize = size.height;
+        final double actionCenterX = size.width - squareSize / 2;
+        lastActionParentData.offset = Offset(
+          actionCenterX - lastActionWidth / 2,
+          0,
+        );
+      } else {
+        // Fallback for other cases (shouldn't happen with 2 actions)
+        double left = 0;
+        double right = size.width;
+        while (child != null) {
+          final RenderBox? nextChild = childAfter(child);
+          final bool isLastAction = nextChild == null;
+          final double desiredWidth = math.min(
+            child.getMaxIntrinsicWidth(double.infinity) +
+                2 * _kSegmentMinPadding,
+            size.width,
           );
-          childParentData.offset = Offset(centeredLeft, 0);
-        } else {
-          childParentData.offset = Offset(left, 0);
-          left += actionWidth;
+          final double remainingWidth = math.max(right - left, 0);
+          final double actionWidth = math.min(desiredWidth, remainingWidth);
+          final BoxConstraints actionConstraints = BoxConstraints.tight(
+            Size(actionWidth, size.height),
+          );
+          child.layout(actionConstraints, parentUsesSize: true);
+          final _SegmentedControlContainerBoxParentData childParentData =
+              child.parentData! as _SegmentedControlContainerBoxParentData;
+          if (isLastAction) {
+            // Center the last action within the square background at the right edge
+            final double squareSize = size.height;
+            final double actionCenterX = size.width - squareSize / 2;
+            childParentData.offset = Offset(actionCenterX - actionWidth / 2, 0);
+          } else {
+            childParentData.offset = Offset(left, 0);
+            left += actionWidth;
+          }
+          child = nextChild;
         }
-        child = nextChild;
       }
     }
   }
@@ -1265,10 +1301,10 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
     // Ignore the horizontal position and the height of `thumbRect`, and
     // calculates them from `children`.
     return Rect.fromLTRB(
-      math.max(thumbRect.left, leftMost - _kThumbInsets.left),
-      firstChildOffset.dy - _kThumbInsets.top,
-      math.min(thumbRect.right, rightMost + _kThumbInsets.right),
-      firstChildOffset.dy + children.first.size.height + _kThumbInsets.bottom,
+      math.max(thumbRect.left, leftMost),
+      firstChildOffset.dy,
+      math.min(thumbRect.right, rightMost),
+      firstChildOffset.dy + children.first.size.height,
     );
   }
 
@@ -1324,18 +1360,14 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
 
       final _SegmentedControlContainerBoxParentData childParentData =
           selectedChild.parentData! as _SegmentedControlContainerBoxParentData;
-      final Rect segmentThumbRect = _kThumbInsets.inflateRect(
-        childParentData.offset & selectedChild.size,
-      );
+      final Rect segmentThumbRect = childParentData.offset & selectedChild.size;
       Rect? actionThumbRect;
       if (actionChildren.isNotEmpty) {
         final RenderBox actionThumbChild = actionChildren.first;
         final _SegmentedControlContainerBoxParentData actionParentData =
             actionThumbChild.parentData!
                 as _SegmentedControlContainerBoxParentData;
-        actionThumbRect = _kThumbInsets.inflateRect(
-          actionParentData.offset & actionThumbChild.size,
-        );
+        actionThumbRect = actionParentData.offset & actionThumbChild.size;
       }
       final Rect targetThumbRect = actionThumbRect == null
           ? segmentThumbRect
@@ -1434,7 +1466,7 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
   void _paintThumb(PaintingContext context, Offset offset, Rect thumbRect) {
     final RRect thumbShape = RRect.fromRectAndRadius(
       thumbRect.shift(offset),
-      _kThumbRadius,
+      _kCornerRadius,
     );
     // Interpolate thumb color from normal thumbColor to backgroundColor during transition
     final Color interpolatedThumbColor =

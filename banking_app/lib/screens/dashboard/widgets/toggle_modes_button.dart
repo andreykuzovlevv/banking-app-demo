@@ -87,6 +87,9 @@ class _ToggleModesButtonState extends State<ToggleModesButton>
   // Track previous value to detect crossing 0.5 threshold
   double _previousValue = 0.0;
 
+  // Track pressed state for scale animation
+  bool _pressed = false;
+
   @override
   void initState() {
     super.initState();
@@ -125,6 +128,11 @@ class _ToggleModesButtonState extends State<ToggleModesButton>
     super.dispose();
   }
 
+  void _setPressed(bool v) {
+    if (_pressed == v) return;
+    setState(() => _pressed = v);
+  }
+
   void _onTap() {
     // if (_controller.isAnimating) return;
     _hasFlippedThisRun = false;
@@ -145,27 +153,35 @@ class _ToggleModesButtonState extends State<ToggleModesButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTapDown: (_) => _setPressed(true),
+      onTapCancel: () => _setPressed(false),
+      onTapUp: (_) => _setPressed(false),
       onTap: _onTap,
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        height: widget.size,
-        width: widget.size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: widget.backgroundColor,
-        ),
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _opacity.value,
-                child: Transform.translate(
-                  offset: Offset(_offsetX.value, 0),
-                  child: Icon(_icon, color: const Color(0xffffffff)),
-                ),
-              );
-            },
+      child: AnimatedScale(
+        scale: _pressed ? 0.7 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          height: widget.size,
+          width: widget.size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: widget.backgroundColor,
+          ),
+          child: Center(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _opacity.value,
+                  child: Transform.translate(
+                    offset: Offset(_offsetX.value, 0),
+                    child: Icon(_icon, color: const Color(0xffffffff)),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),

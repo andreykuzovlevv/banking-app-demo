@@ -9,7 +9,6 @@ class AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       margin: Styles.horizontalBodyPadding,
       padding: Styles.cardPadding,
@@ -19,7 +18,7 @@ class AccountCard extends StatelessWidget {
           colors: [
             const Color.fromARGB(255, 200, 209, 255),
             const Color.fromARGB(255, 58, 87, 253),
-            theme.cardColor,
+            AppColors.surface,
           ],
           radius: 2,
           center: AlignmentGeometry.xy(0.8, 2.2),
@@ -34,6 +33,7 @@ class AccountCard extends StatelessWidget {
               Avatar(),
               Spacer(),
               CircleIconButton(
+                backgroundColor: AppColors.highlighted,
                 icon: CupertinoIcons.bell,
                 showBadge: true,
               ), // Notifications Button
@@ -98,6 +98,8 @@ class UserBalance extends StatelessWidget {
 class AccountOperations extends StatelessWidget {
   const AccountOperations({super.key});
 
+  static const double iconSize = 24;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -108,19 +110,32 @@ class AccountOperations extends StatelessWidget {
           child: CircleIconButton(
             icon: CupertinoIcons.add,
             label: 'Add saving',
+            iconSize: iconSize,
           ),
         ),
         SizedBox(
           width: 72,
-          child: CircleIconButton(icon: CupertinoIcons.add, label: 'Withdraw'),
+          child: CircleIconButton(
+            icon: CupertinoIcons.add,
+            label: 'Withdraw',
+            iconSize: iconSize,
+          ),
         ),
         SizedBox(
           width: 72,
-          child: CircleIconButton(icon: CupertinoIcons.add, label: 'Top up'),
+          child: CircleIconButton(
+            icon: CupertinoIcons.add,
+            label: 'Top up',
+            iconSize: iconSize,
+          ),
         ),
         SizedBox(
           width: 72,
-          child: CircleIconButton(icon: CupertinoIcons.add, label: 'Exchange'),
+          child: CircleIconButton(
+            icon: CupertinoIcons.add,
+            label: 'Exchange',
+            iconSize: iconSize,
+          ),
         ),
       ],
     );
