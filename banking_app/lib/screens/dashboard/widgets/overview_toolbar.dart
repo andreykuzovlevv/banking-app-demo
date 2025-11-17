@@ -3,6 +3,7 @@ library;
 import 'dart:math' as math;
 import 'dart:math';
 
+import 'package:banking_app/screens/dashboard/dashboard.dart';
 import 'package:banking_app/screens/dashboard/widgets/toggle_modes_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

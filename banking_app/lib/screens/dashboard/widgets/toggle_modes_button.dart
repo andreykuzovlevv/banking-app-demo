@@ -1,28 +1,5 @@
+import 'package:banking_app/screens/dashboard/dashboard.dart';
 import 'package:flutter/cupertino.dart';
-
-enum ViewMode {
-  currency,
-  activity;
-
-  ViewMode get opposite {
-    switch (this) {
-      case ViewMode.currency:
-        return ViewMode.activity;
-      case ViewMode.activity:
-        return ViewMode.currency;
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case ViewMode.currency:
-        return CupertinoIcons.chart_bar;
-      case ViewMode.activity:
-        return CupertinoIcons.clear;
-      // add other modes if needed
-    }
-  }
-}
 
 class ToggleModesButton extends StatefulWidget {
   const ToggleModesButton({

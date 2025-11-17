@@ -1,10 +1,33 @@
 import 'package:banking_app/screens/dashboard/widgets/overview_toolbar.dart';
-import 'package:banking_app/screens/dashboard/widgets/toggle_modes_button.dart';
 import 'package:banking_app/styles/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/widgets.dart';
+
+enum ViewMode {
+  currency,
+  activity;
+
+  ViewMode get opposite {
+    switch (this) {
+      case ViewMode.currency:
+        return ViewMode.activity;
+      case ViewMode.activity:
+        return ViewMode.currency;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ViewMode.currency:
+        return CupertinoIcons.chart_bar;
+      case ViewMode.activity:
+        return CupertinoIcons.clear;
+      // add other modes if needed
+    }
+  }
+}
 
 enum Currency { crypto, fiat, card, savings }
 
@@ -25,7 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   late final AnimationController overviewTransitionController =
       AnimationController(
-        duration: Duration(seconds: 1),
+        duration: Duration(milliseconds: 750),
         value: 0,
         vsync: this,
       );
@@ -50,13 +73,35 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+  ViewMode _modeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return ViewMode.currency;
+      case 1:
+      default:
+        return ViewMode.activity;
+    }
+  }
+
   void _toggleViewMode(ViewMode mode) {
     final nextIndex = mode == ViewMode.currency ? 0 : 1;
-    final isAnimating =
-        _pendingOverviewIndex != null ||
-        overviewTransitionController.isAnimating;
+    final hasPending = _pendingOverviewIndex != null;
+    final isAnimating = overviewTransitionController.isAnimating;
 
-    if (overviewMode == mode || nextIndex == overviewIndex || isAnimating) {
+    // If an animation is in progress, allow gracefully reversing back to
+    // the currently visible index, but don't start a new forward animation yet.
+    if (hasPending && isAnimating) {
+      // User tapped the mode that corresponds to the currently visible index:
+      // run the animation in reverse to go back "naturally".
+      if (nextIndex == overviewIndex) {
+        overviewTransitionController.reverse();
+      }
+      // Ignore other taps while the transition is running.
+      return;
+    }
+
+    // If nothing would change and we're not animating, bail out.
+    if (!isAnimating && (overviewMode == mode || nextIndex == overviewIndex)) {
       return;
     }
 
@@ -69,16 +114,26 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _onOverviewTransitionStatus(AnimationStatus status) {
-    if (status != AnimationStatus.completed || _pendingOverviewIndex == null) {
+    if (_pendingOverviewIndex == null) {
       return;
     }
 
-    setState(() {
-      overviewIndex = _pendingOverviewIndex!;
-      _pendingOverviewIndex = null;
-    });
+    if (status == AnimationStatus.completed) {
+      setState(() {
+        overviewIndex = _pendingOverviewIndex!;
+        _pendingOverviewIndex = null;
+        overviewMode = _modeForIndex(overviewIndex);
+      });
 
-    overviewTransitionController.reset();
+      overviewTransitionController.reset();
+    } else if (status == AnimationStatus.dismissed) {
+      // A reverse() run finished – cancel the pending change and ensure
+      // the mode matches the currently visible index.
+      setState(() {
+        _pendingOverviewIndex = null;
+        overviewMode = _modeForIndex(overviewIndex);
+      });
+    }
   }
 
   double _phaseValue(double value, double begin, double end) {
