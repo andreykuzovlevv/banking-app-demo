@@ -56,36 +56,73 @@ class StackCards extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 16),
+          padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
           child: Text('Recent transactions'),
         ),
-        Container(
-          height: 76,
-          width: double.infinity,
-          padding: Styles.bodyPadding,
-          decoration: BoxDecoration(
-            color: AppColors.onBackground,
-            borderRadius: BorderRadius.circular(38),
-          ),
-          child: Row(
-            children: [
-              CircleIconButton(
-                icon: CupertinoIcons.arrow_right_arrow_left,
-                iconSize: 24,
+        Stack(
+          children: [
+            Opacity(
+              opacity: 0.6,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..translateByDouble(0, 24, 0, 1)
+                  ..scaleByDouble(0.8, 0.8, 0.8, 1),
+                child: CardContainer(),
               ),
-              SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [Text('USDT to BTC'), Text('2023-07-25')],
+            ),
+            Opacity(
+              opacity: 0.8,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..translateByDouble(0, 12, 0, 1)
+                  ..scaleByDouble(0.90, 0.90, 0.90, 1),
+                child: CardContainer(),
               ),
-              Spacer(),
-              Text('+0,0116 BTC'),
-              SizedBox(width: 12),
-            ],
-          ),
+            ),
+            CardContainer(
+              child: Row(
+                children: [
+                  CircleIconButton(
+                    icon: CupertinoIcons.arrow_right_arrow_left,
+                    iconSize: 24,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [Text('USDT to BTC'), Text('2023-07-25')],
+                  ),
+                  Spacer(),
+                  Text('+0,0116 BTC'),
+                  SizedBox(width: 12),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
+    );
+  }
+}
+
+class CardContainer extends StatelessWidget {
+  const CardContainer({super.key, this.child});
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 76,
+      width: double.infinity,
+      padding: Styles.bodyPadding,
+      decoration: BoxDecoration(
+        color: AppColors.onBackground,
+        borderRadius: BorderRadius.circular(38),
+        boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 4)],
+      ),
+      child: child,
     );
   }
 }
