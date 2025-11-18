@@ -154,7 +154,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Column(
         children: [
           SizedBox(height: topPadding),
@@ -263,7 +262,7 @@ class _OverviewAnimatedColumn extends StatelessWidget {
       case ViewMode.activity:
         return const ActivityPanel();
       case ViewMode.currency:
-        return const CyrrencyPanel();
+        return const CurrencyPanel();
     }
   }
 

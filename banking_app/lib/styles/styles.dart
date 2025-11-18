@@ -4,14 +4,28 @@ part 'app_colors.dart';
 
 abstract class Styles {
   // text
-  static const bold = TextStyle(fontWeight: FontWeight.bold);
-  static const title = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
-  static const subtitle = TextStyle(fontSize: 16, fontWeight: FontWeight.w500);
-  static const callout = TextStyle(fontSize: 18, fontWeight: FontWeight.w600);
-  static const mainListTileTitle = TextStyle(
-    fontSize: 18,
+
+  /// As the name in app card. Bold with normal size.
+  ///
+  static const bold = TextStyle(fontWeight: FontWeight.w500, fontSize: 18);
+
+  /// Grayish, with size smaller then normal
+  ///
+  static const secondary = TextStyle(fontSize: 14, color: Colors.grey);
+
+  static const largeTitle = TextStyle(
+    fontSize: 44.0,
     fontWeight: FontWeight.w500,
   );
+  static const mediumTitle = TextStyle(
+    fontSize: 28.0,
+    fontWeight: FontWeight.w500,
+  );
+  static const smallTitle = TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.bold,
+  );
+
   static const sectionTitle = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,

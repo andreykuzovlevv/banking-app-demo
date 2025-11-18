@@ -18,11 +18,12 @@ class AccountCard extends StatelessWidget {
           colors: [
             const Color.fromARGB(255, 200, 209, 255),
             const Color.fromARGB(255, 58, 87, 253),
+            const Color.fromARGB(255, 13, 36, 163),
             AppColors.surface,
           ],
           radius: 2,
           center: AlignmentGeometry.xy(0.8, 2.2),
-          stops: [0.25, 0.4, 0.65],
+          stops: [0.28, 0.4, 0.5, 0.7],
           focal: Alignment(0.8, 2.2),
         ),
       ),
@@ -35,6 +36,7 @@ class AccountCard extends StatelessWidget {
               CircleIconButton(
                 backgroundColor: AppColors.highlighted,
                 icon: CupertinoIcons.bell,
+                iconSize: 30,
                 showBadge: true,
               ), // Notifications Button
             ],
@@ -48,8 +50,8 @@ class AccountCard extends StatelessWidget {
                 Row(
                   spacing: 6,
                   children: [
-                    Text('Total balance'),
-                    Icon(CupertinoIcons.eye, size: 20),
+                    Text('Total balance', style: Styles.secondary),
+                    Icon(CupertinoIcons.eye, size: 18, color: Colors.grey),
                   ],
                 ),
                 UserBalance(),
@@ -80,7 +82,7 @@ class Avatar extends StatelessWidget {
             backgroundColor: Colors.deepOrangeAccent,
           ),
         ),
-        Text('Butter Dog'),
+        Text('Butter Dog', style: Styles.bold),
       ],
     );
   }
@@ -91,14 +93,14 @@ class UserBalance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(r'$12 345 678,90', style: TextStyle(fontSize: 40));
+    return Text(r'$12 345 678,90', style: Styles.largeTitle);
   }
 }
 
 class AccountOperations extends StatelessWidget {
   const AccountOperations({super.key});
 
-  static const double iconSize = 24;
+  static const double _iconSize = 24;
 
   @override
   Widget build(BuildContext context) {
@@ -110,31 +112,31 @@ class AccountOperations extends StatelessWidget {
           child: CircleIconButton(
             icon: CupertinoIcons.add,
             label: 'Add saving',
-            iconSize: iconSize,
+            iconSize: _iconSize,
           ),
         ),
         SizedBox(
           width: 72,
           child: CircleIconButton(
-            icon: CupertinoIcons.add,
+            icon: CupertinoIcons.arrow_up,
             label: 'Withdraw',
-            iconSize: iconSize,
+            iconSize: _iconSize,
           ),
         ),
         SizedBox(
           width: 72,
           child: CircleIconButton(
-            icon: CupertinoIcons.add,
+            icon: CupertinoIcons.arrow_down,
             label: 'Top up',
-            iconSize: iconSize,
+            iconSize: _iconSize,
           ),
         ),
         SizedBox(
           width: 72,
           child: CircleIconButton(
-            icon: CupertinoIcons.add,
+            icon: CupertinoIcons.arrow_right_arrow_left,
             label: 'Exchange',
-            iconSize: iconSize,
+            iconSize: _iconSize,
           ),
         ),
       ],

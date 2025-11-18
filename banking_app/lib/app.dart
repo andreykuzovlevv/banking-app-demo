@@ -1,3 +1,4 @@
+import 'package:banking_app/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
@@ -14,7 +15,7 @@ class BankingApp extends StatelessWidget {
       title: 'Persistent Bottom Navigation Bar Demo',
       theme: ThemeData.dark(),
       home: PersistentTabView(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.background,
         tabs: [
           PersistentTabConfig(
             screen: const DashboardScreen(),

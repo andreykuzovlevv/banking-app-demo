@@ -12,6 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   lottie: ^3.3.2
   persistent_bottom_nav_bar_v2: ^6.2.0
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -20,6 +21,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: AppleEmoji
+      fonts:
+        - asset: assets/fonts/AppleColorEmoji.ttf
+        
   assets:
     - assets/lottie_animations/
     - assets/img/
