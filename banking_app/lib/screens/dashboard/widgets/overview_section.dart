@@ -1,3 +1,4 @@
+import 'package:banking_app/screens/dashboard/dashboard.dart';
 import 'package:banking_app/styles/styles.dart';
 import 'package:banking_app/widgets/circle_icon_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -183,7 +184,10 @@ class CurrencyPanel extends StatelessWidget {
             child: Stack(
               children: [
                 Positioned(
-                  child: CircleIconButton(icon: CupertinoIcons.money_dollar),
+                  child: CircleIconButton(
+                    icon: CupertinoIcons.money_dollar,
+                    backgroundColor: Colors.orange,
+                  ),
                 ),
                 Positioned(
                   bottom: 8,
@@ -204,8 +208,12 @@ class CurrencyPanel extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: Styles.spaceBetween / 2,
                     children: [
-                      Icon(CupertinoIcons.arrow_up, size: 20),
-                      Text('2,15'),
+                      Icon(
+                        CupertinoIcons.arrow_up,
+                        size: 20,
+                        color: Colors.green,
+                      ),
+                      Text('2,15%', style: TextStyle(color: Colors.green)),
                     ],
                   ),
                 ),
@@ -218,6 +226,8 @@ class CurrencyPanel extends StatelessWidget {
   }
 }
 
+const String recentTransactionHeroTag = 'recent_transaction_card';
+
 class StackCards extends StatelessWidget {
   const StackCards({super.key});
 
@@ -228,7 +238,10 @@ class StackCards extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
-          child: Text('Recent transactions'),
+          child: Text(
+            'Recent transactions',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
+          ),
         ),
         Stack(
           children: [
@@ -252,27 +265,27 @@ class StackCards extends StatelessWidget {
                 child: CardContainer(),
               ),
             ),
-            CardContainer(
-              child: Row(
-                children: [
-                  CircleIconButton(
-                    icon: CupertinoIcons.arrow_right_arrow_left,
-                    iconSize: 24,
-                  ),
-                  SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('USDT to BTC', style: Styles.bold),
-                      Text('2023-07-25', style: Styles.secondary),
-                    ],
-                  ),
-                  Spacer(),
-                  Text('+0,0116 BTC'),
-                  SizedBox(width: 12),
-                ],
+            Hero(
+              tag: listViewContainerTag,
+              child: Container(
+                height: 76,
+                width: double.infinity,
+                padding: Styles.bodyPadding,
+                decoration: BoxDecoration(
+                  color: AppColors.onBackground,
+                  borderRadius: BorderRadius.circular(38),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.background.withAlpha(60),
+                      blurRadius: 2,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
               ),
+            ),
+            CardContainer(
+              child: Hero(tag: recentTransactionHeroTag, child: CurrencyInfo()),
             ),
           ],
         ),
@@ -294,9 +307,47 @@ class CardContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.onBackground,
         borderRadius: BorderRadius.circular(38),
-        boxShadow: [BoxShadow(color: AppColors.background, blurRadius: 4)],
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.background.withAlpha(60),
+            blurRadius: 2,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: child,
+    );
+  }
+}
+
+class CurrencyInfo extends StatelessWidget {
+  const CurrencyInfo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CircleIconButton(
+          icon: CupertinoIcons.arrow_right_arrow_left,
+          iconSize: 24,
+          backgroundColor: AppColors.highlighted,
+        ),
+        SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('USDT to BTC', style: Styles.bold),
+            Text('2023-07-25', style: Styles.secondary),
+          ],
+        ),
+        Spacer(),
+        Text(
+          '+0,0116 BTC',
+          style: TextStyle(color: Colors.green, fontSize: 17),
+        ),
+        SizedBox(width: 12),
+      ],
     );
   }
 }

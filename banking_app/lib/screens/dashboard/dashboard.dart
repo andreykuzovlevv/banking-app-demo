@@ -178,8 +178,11 @@ class _DashboardScreenState extends State<DashboardScreen>
               spacing: 6,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Card analysis'),
-                Icon(CupertinoIcons.chevron_down, size: 16),
+                Text(
+                  'Card analysis',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                Icon(CupertinoIcons.chevron_down, size: 16, color: Colors.grey),
               ],
             ),
             actionTwo: Icon(CupertinoIcons.gear, color: Color(0xffffffff)),
@@ -268,6 +271,20 @@ class _OverviewAnimatedColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void _showBottomSheet() async {
+      await Navigator.of(context).push(
+        //rootNavigator: true
+        PageRouteBuilder(
+          transitionDuration: Duration(seconds: 30),
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const ListViewPage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return child;
+          },
+        ),
+      );
+    }
+
     return Padding(
       padding: Styles.horizontalBodyPadding,
       child: Column(
@@ -284,7 +301,69 @@ class _OverviewAnimatedColumn extends StatelessWidget {
             opacity: cardsOpacity,
             child: Transform.translate(
               offset: Offset(0, cardsOffsetY),
-              child: const StackCards(),
+              child: GestureDetector(
+                onTap: () => _showBottomSheet(),
+                child: const StackCards(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const String listViewContainerTag = 'list_view_container_tag';
+
+class ListViewPage extends StatelessWidget {
+  const ListViewPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Stack(
+        children: [
+          Hero(
+            tag: listViewContainerTag,
+            child: Container(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.only(top: 16, right: 8, left: 8),
+              padding: EdgeInsets.only(right: 8, left: 8),
+              decoration: BoxDecoration(
+                color: AppColors.onBackground,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(30),
+                  bottom: Radius.circular(30),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            clipBehavior: Clip.antiAlias,
+            margin: EdgeInsets.only(top: 16, right: 8, left: 8),
+            padding: EdgeInsets.only(right: 8, left: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: ListView(
+              padding: EdgeInsets.only(bottom: 18),
+              children: List.generate(30, (index) {
+                final card = const CurrencyInfo();
+                if (index == 0) {
+                  return Hero(
+                    tag: recentTransactionHeroTag,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: card,
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: card,
+                );
+              }),
             ),
           ),
         ],

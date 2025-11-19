@@ -78,7 +78,7 @@ class Avatar extends StatelessWidget {
         Pressable(
           child: CircleAvatar(
             radius: 30,
-            foregroundImage: AssetImage('assets/img/Butter_Dog.webp'),
+            foregroundImage: AssetImage('assets/img/butter_dog.jpg'),
             backgroundColor: Colors.deepOrangeAccent,
           ),
         ),
