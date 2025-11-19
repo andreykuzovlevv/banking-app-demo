@@ -1,4 +1,3 @@
-import 'package:banking_app/screens/dashboard/dashboard.dart';
 import 'package:banking_app/styles/styles.dart';
 import 'package:banking_app/widgets/circle_icon_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -226,10 +225,10 @@ class CurrencyPanel extends StatelessWidget {
   }
 }
 
-const String recentTransactionHeroTag = 'recent_transaction_card';
-
 class StackCards extends StatelessWidget {
-  const StackCards({super.key});
+  const StackCards({super.key, this.cardKey});
+
+  final GlobalKey? cardKey;
 
   @override
   Widget build(BuildContext context) {
@@ -265,28 +264,23 @@ class StackCards extends StatelessWidget {
                 child: CardContainer(),
               ),
             ),
-            Hero(
-              tag: listViewContainerTag,
-              child: Container(
-                height: 76,
-                width: double.infinity,
-                padding: Styles.bodyPadding,
-                decoration: BoxDecoration(
-                  color: AppColors.onBackground,
-                  borderRadius: BorderRadius.circular(38),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.background.withAlpha(60),
-                      blurRadius: 2,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
+            Container(
+              height: 76,
+              width: double.infinity,
+              padding: Styles.bodyPadding,
+              decoration: BoxDecoration(
+                color: AppColors.onBackground,
+                borderRadius: BorderRadius.circular(38),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.background.withAlpha(60),
+                    blurRadius: 2,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
             ),
-            CardContainer(
-              child: Hero(tag: recentTransactionHeroTag, child: CurrencyInfo()),
-            ),
+            CardContainer(key: cardKey, child: CurrencyInfo()),
           ],
         ),
       ],

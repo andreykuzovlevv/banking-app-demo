@@ -271,9 +271,8 @@ class _OverviewAnimatedColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void _showBottomSheet() async {
-      await Navigator.of(context).push(
-        //rootNavigator: true
+    void showBottomSheet() async {
+      await Navigator.of(context, rootNavigator: true).push(
         PageRouteBuilder(
           transitionDuration: Duration(seconds: 30),
           pageBuilder: (context, animation, secondaryAnimation) =>
@@ -302,7 +301,7 @@ class _OverviewAnimatedColumn extends StatelessWidget {
             child: Transform.translate(
               offset: Offset(0, cardsOffsetY),
               child: GestureDetector(
-                onTap: () => _showBottomSheet(),
+                onTap: () => showBottomSheet(),
                 child: const StackCards(),
               ),
             ),
@@ -313,8 +312,6 @@ class _OverviewAnimatedColumn extends StatelessWidget {
   }
 }
 
-const String listViewContainerTag = 'list_view_container_tag';
-
 class ListViewPage extends StatelessWidget {
   const ListViewPage({super.key});
 
@@ -324,18 +321,15 @@ class ListViewPage extends StatelessWidget {
       appBar: AppBar(),
       body: Stack(
         children: [
-          Hero(
-            tag: listViewContainerTag,
-            child: Container(
-              clipBehavior: Clip.antiAlias,
-              margin: EdgeInsets.only(top: 16, right: 8, left: 8),
-              padding: EdgeInsets.only(right: 8, left: 8),
-              decoration: BoxDecoration(
-                color: AppColors.onBackground,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(30),
-                  bottom: Radius.circular(30),
-                ),
+          Container(
+            clipBehavior: Clip.antiAlias,
+            margin: EdgeInsets.only(top: 16, right: 8, left: 8),
+            padding: EdgeInsets.only(right: 8, left: 8),
+            decoration: BoxDecoration(
+              color: AppColors.onBackground,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(30),
+                bottom: Radius.circular(30),
               ),
             ),
           ),
@@ -351,12 +345,9 @@ class ListViewPage extends StatelessWidget {
               children: List.generate(30, (index) {
                 final card = const CurrencyInfo();
                 if (index == 0) {
-                  return Hero(
-                    tag: recentTransactionHeroTag,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: card,
-                    ),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: card,
                   );
                 }
                 return Padding(
