@@ -210,9 +210,9 @@ class CurrencyPanel extends StatelessWidget {
                       Icon(
                         CupertinoIcons.arrow_up,
                         size: 20,
-                        color: Colors.green,
+                        color: AppColors.green,
                       ),
-                      Text('2,15%', style: TextStyle(color: Colors.green)),
+                      Text('2,15%', style: TextStyle(color: AppColors.green)),
                     ],
                   ),
                 ),
@@ -225,65 +225,96 @@ class CurrencyPanel extends StatelessWidget {
   }
 }
 
-class StackCards extends StatelessWidget {
-  const StackCards({super.key, this.cardKey});
+class StackCards extends StatefulWidget {
+  const StackCards({
+    super.key,
+    required this.containerKey,
+    required this.cardInfoKey,
+    this.onTap,
+  });
 
-  final GlobalKey? cardKey;
+  final GlobalKey containerKey;
+  final GlobalKey cardInfoKey;
+  final VoidCallback? onTap;
+
+  @override
+  State<StackCards> createState() => _StackCardsState();
+}
+
+class _StackCardsState extends State<StackCards> {
+  static const Duration _kScaleDuration = Duration(milliseconds: 200);
+  bool _pressed = false;
+  bool _waitingAnimation = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() {
+      _pressed = value;
+    });
+  }
+
+  Future<void> _handleTap() async {
+    if (_waitingAnimation) return;
+    _setPressed(false);
+    _waitingAnimation = true;
+    await Future.delayed(_kScaleDuration);
+    if (!mounted) return;
+    widget.onTap?.call();
+    _waitingAnimation = false;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
-          child: Text(
-            'Recent transactions',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
-          ),
-        ),
-        Stack(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) => _setPressed(true),
+      onTapCancel: () => _setPressed(false),
+      onTap: _handleTap,
+      child: AnimatedScale(
+        scale: _pressed ? 0.9 : 1.0,
+        duration: _kScaleDuration,
+        curve: Curves.easeOut,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Opacity(
-              opacity: 0.6,
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.identity()
-                  ..translateByDouble(0, 24, 0, 1)
-                  ..scaleByDouble(0.8, 0.8, 0.8, 1),
-                child: CardContainer(),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
+              child: Text(
+                'Recent transactions',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
               ),
             ),
-            Opacity(
-              opacity: 0.8,
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.identity()
-                  ..translateByDouble(0, 12, 0, 1)
-                  ..scaleByDouble(0.90, 0.90, 0.90, 1),
-                child: CardContainer(),
-              ),
-            ),
-            Container(
-              height: 76,
-              width: double.infinity,
-              padding: Styles.bodyPadding,
-              decoration: BoxDecoration(
-                color: AppColors.onBackground,
-                borderRadius: BorderRadius.circular(38),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.background.withAlpha(60),
-                    blurRadius: 2,
-                    offset: Offset(0, 2),
+            Stack(
+              children: [
+                Opacity(
+                  opacity: 0.6,
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..translateByDouble(0, 24, 0, 1)
+                      ..scaleByDouble(0.8, 0.8, 0.8, 1),
+                    child: const CardContainer(),
                   ),
-                ],
-              ),
+                ),
+                Opacity(
+                  opacity: 0.8,
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..translateByDouble(0, 12, 0, 1)
+                      ..scaleByDouble(0.90, 0.90, 0.90, 1),
+                    child: const CardContainer(),
+                  ),
+                ),
+                CardContainer(
+                  key: widget.containerKey,
+                  child: CurrencyInfo(key: widget.cardInfoKey),
+                ),
+              ],
             ),
-            CardContainer(key: cardKey, child: CurrencyInfo()),
           ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -338,7 +369,7 @@ class CurrencyInfo extends StatelessWidget {
         Spacer(),
         Text(
           '+0,0116 BTC',
-          style: TextStyle(color: Colors.green, fontSize: 17),
+          style: TextStyle(color: AppColors.green, fontSize: 17),
         ),
         SizedBox(width: 12),
       ],

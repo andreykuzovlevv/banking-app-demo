@@ -10,6 +10,7 @@ class CircleIconButton extends StatelessWidget {
     this.backgroundColor = Colors.white24,
     this.showBadge = false,
     this.onPressed,
+    this.pressedScale = 0.97,
   });
 
   final IconData icon;
@@ -18,10 +19,12 @@ class CircleIconButton extends StatelessWidget {
   final Color backgroundColor;
   final bool showBadge;
   final VoidCallback? onPressed;
+  final double pressedScale;
 
   @override
   Widget build(BuildContext context) {
     return Pressable(
+      pressedScale: pressedScale,
       onTap: onPressed,
       child: Column(
         spacing: 10,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 part 'app_colors.dart';
@@ -37,7 +38,7 @@ abstract class Styles {
   static const subtitleOpacity = 0.7;
   static const timeControl = TextStyle(letterSpacing: 1.2);
   static const formLabel = TextStyle(fontWeight: FontWeight.bold);
-  static const formError = TextStyle(color: AppColors.red);
+
   static const formDescription = TextStyle(fontSize: 12);
   static const linkStyle = TextStyle(
     color: Colors.blueAccent,
