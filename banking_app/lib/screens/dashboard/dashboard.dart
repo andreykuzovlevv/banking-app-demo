@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:banking_app/screens/dashboard/widgets/overview_toolbar.dart';
 import 'package:banking_app/styles/styles.dart';
+import 'package:banking_app/widgets/circle_icon_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -271,14 +274,19 @@ class _OverviewAnimatedColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardKey = GlobalKey();
+
     void showBottomSheet() async {
+      // Get the source widget's position
+      final RenderBox? renderBox =
+          cardKey.currentContext?.findRenderObject() as RenderBox?;
+      final sourcePosition = renderBox?.localToGlobal(Offset.zero);
+      final sourceSize = renderBox?.size;
+
       await Navigator.of(context, rootNavigator: true).push(
         PageRouteBuilder(
-          transitionDuration: Duration(seconds: 30),
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const ListViewPage(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return child;
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return ListViewPage(listenable: animation);
           },
         ),
       );
@@ -302,7 +310,7 @@ class _OverviewAnimatedColumn extends StatelessWidget {
               offset: Offset(0, cardsOffsetY),
               child: GestureDetector(
                 onTap: () => showBottomSheet(),
-                child: const StackCards(),
+                child: StackCards(cardKey: cardKey),
               ),
             ),
           ),
@@ -312,53 +320,270 @@ class _OverviewAnimatedColumn extends StatelessWidget {
   }
 }
 
-class ListViewPage extends StatelessWidget {
-  const ListViewPage({super.key});
+class ListViewPage extends AnimatedWidget {
+  const ListViewPage({super.key, required super.listenable});
+
+  Animation<double> get _animation => listenable as Animation<double>;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Stack(
-        children: [
-          Container(
-            clipBehavior: Clip.antiAlias,
-            margin: EdgeInsets.only(top: 16, right: 8, left: 8),
-            padding: EdgeInsets.only(right: 8, left: 8),
-            decoration: BoxDecoration(
-              color: AppColors.onBackground,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(30),
-                bottom: Radius.circular(30),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 70,
+        leadingWidth: 100,
+        leading: CircleIconButton(
+          icon: CupertinoIcons.clear,
+          backgroundColor: AppColors.onBackground,
+          iconSize: 26,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: Container(
+        color: AppColors.background,
+        child: Stack(
+          children: [
+            // Background container - rendered first (under everything)
+            Container(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.only(top: 16, right: 8, left: 8),
+              padding: EdgeInsets.only(right: 8, left: 8),
+              decoration: BoxDecoration(
+                color: AppColors.onBackground,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(30),
+                  bottom: Radius.circular(30),
+                ),
               ),
             ),
-          ),
-          Container(
-            clipBehavior: Clip.antiAlias,
-            margin: EdgeInsets.only(top: 16, right: 8, left: 8),
-            padding: EdgeInsets.only(right: 8, left: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            ),
-            child: ListView(
-              padding: EdgeInsets.only(bottom: 18),
-              children: List.generate(30, (index) {
-                final card = const CurrencyInfo();
-                if (index == 0) {
+            // List container - rendered on top
+            Container(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.only(top: 16, right: 8, left: 8),
+              padding: EdgeInsets.only(right: 8, left: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              child: ListView(
+                padding: EdgeInsets.only(bottom: 18, top: 8),
+                children: List.generate(30, (index) {
+                  final card = const CurrencyInfo();
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: card,
                   );
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: card,
-                );
-              }),
+                }),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _CustomPageRoute extends PageRoute {
+  final Widget child;
+  final Offset sourcePosition;
+  final Size sourceSize;
+
+  _CustomPageRoute({
+    required this.child,
+    required this.sourcePosition,
+    required this.sourceSize,
+  });
+
+  @override
+  Color? get barrierColor => null;
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 8000);
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    // Pass animation to child so it can animate list items
+    return ListViewPage(listenable: animation);
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final screenSize = MediaQuery.of(context).size;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final appBarHeight = AppBar().preferredSize.height;
+
+    // Use source position if valid, otherwise calculate a default
+    final validSourcePosition = sourcePosition.dx > 0 && sourcePosition.dy > 0
+        ? sourcePosition
+        : Offset(8, screenSize.height * 0.5);
+    final validSourceSize = sourceSize.width > 0 && sourceSize.height > 0
+        ? sourceSize
+        : Size(screenSize.width - 16, 76.0);
+
+    // Calculate destination position (first list item position)
+    final destinationY =
+        topPadding +
+        appBarHeight +
+        16 +
+        8; // topPadding + appBar + margin + padding
+    final destinationX = 8.0; // margin
+    final destinationSize = Size(
+      screenSize.width - 16,
+      76.0,
+    ); // width minus margins, height of card
+
+    // Animation curves for different phases
+    final cardMorphCurve = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.0, 0.5, curve: Curves.easeInOutCubic),
+    );
+
+    final backgroundExpandCurve = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
+    );
+
+    final appBarCurve = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.2, 0.6, curve: Curves.easeOut),
+    );
+
+    final blurCurve = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
+    );
+
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) {
+        // Card morphing animation
+        final cardProgress = cardMorphCurve.value;
+        final cardX =
+            validSourcePosition.dx +
+            (destinationX - validSourcePosition.dx) * cardProgress;
+        final cardY =
+            validSourcePosition.dy +
+            (destinationY - validSourcePosition.dy) * cardProgress;
+        final cardWidth =
+            validSourceSize.width +
+            (destinationSize.width - validSourceSize.width) * cardProgress;
+        final cardHeight =
+            validSourceSize.height +
+            (destinationSize.height - validSourceSize.height) * cardProgress;
+        final cardBorderRadius =
+            38.0 * (1 - cardProgress) + 30.0 * cardProgress;
+        final cardOpacity = cardProgress < 0.4
+            ? 1.0 - (cardProgress / 0.4)
+            : 0.0;
+
+        // Background expansion from card position
+        final backgroundProgress = backgroundExpandCurve.value;
+        final backgroundStartY = validSourcePosition.dy;
+        final backgroundEndY = 0.0;
+        final backgroundY =
+            backgroundStartY +
+            (backgroundEndY - backgroundStartY) * backgroundProgress;
+        final backgroundHeight =
+            validSourceSize.height +
+            (screenSize.height - validSourceSize.height) * backgroundProgress;
+        final backgroundBorderRadius =
+            38.0 * (1 - backgroundProgress) + 30.0 * backgroundProgress;
+
+        // AppBar animation
+        final appBarProgress = appBarCurve.value;
+        final appBarOpacity = appBarProgress;
+        final appBarOffset = (1 - appBarProgress) * -60;
+
+        // Blur effect
+        final blurProgress = blurCurve.value;
+        final blurSigma = 8.0 * blurProgress;
+        final blurOpacity = blurProgress < 0.5
+            ? blurProgress * 2
+            : 1.0 - (blurProgress - 0.5) * 2;
+
+        return Stack(
+          children: [
+            // Background blur layer (fades in then out)
+            if (blurProgress > 0 && blurOpacity > 0)
+              Positioned.fill(
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: blurSigma,
+                      sigmaY: blurSigma,
+                    ),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+              ),
+
+            // Expanding background container
+            Positioned(
+              left: 8,
+              top: backgroundY,
+              right: 8,
+              height: backgroundHeight,
+              child: Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: AppColors.onBackground,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(backgroundBorderRadius),
+                    bottom: Radius.circular(30),
+                  ),
+                ),
+              ),
+            ),
+
+            // Main content (child) - rendered on top
+            Transform.translate(
+              offset: Offset(0, appBarOffset),
+              child: Opacity(opacity: appBarOpacity, child: child),
+            ),
+
+            // Morphing card overlay (fades out as it morphs)
+            if (cardProgress < 1.0 && cardOpacity > 0)
+              Positioned(
+                left: cardX,
+                top: cardY,
+                child: Container(
+                  width: cardWidth,
+                  height: cardHeight,
+                  padding: Styles.bodyPadding,
+                  decoration: BoxDecoration(
+                    color: AppColors.onBackground,
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.background.withAlpha(60),
+                        blurRadius: 2,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: cardProgress < 0.6 ? const CurrencyInfo() : null,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
