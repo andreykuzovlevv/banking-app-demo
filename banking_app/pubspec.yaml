@@ -11,7 +11,6 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   lottie: ^3.3.2
-  persistent_bottom_nav_bar_v2: ^6.2.0
   fl_chart: ^1.1.1
 
 dev_dependencies:

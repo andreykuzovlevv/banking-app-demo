@@ -11,12 +11,12 @@ class ActivityPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
+      height: 240,
       width: double.infinity,
-      padding: Styles.bodyPadding,
+      padding: Styles.paddingAll,
       decoration: BoxDecoration(
         color: AppColors.onBackground,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: Styles.borderRadius,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -35,7 +35,7 @@ class ActivityPanel extends StatelessWidget {
                   children: [
                     Styles.gap,
                     Padding(
-                      padding: Styles.horizontalBodyPadding,
+                      padding: Styles.horizontalPadding,
                       child: Column(
                         children: [
                           Text('Spending this month', style: Styles.secondary),
@@ -46,7 +46,7 @@ class ActivityPanel extends StatelessWidget {
                     ),
                     Styles.gap,
                     Container(
-                      padding: Styles.bodyPadding * 1.2,
+                      padding: Styles.paddingAll * 1.5,
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.highlighted),
                         borderRadius: BorderRadius.circular(40),
@@ -71,8 +71,8 @@ class ActivityPanel extends StatelessWidget {
               ),
 
               SizedBox(
-                height: 220 - (Styles.spaceBetween * 5) - 52,
-                width: 220 - (Styles.spaceBetween * 5) - 52,
+                height: 240 - (Styles.spaceBetween * 5) - 52,
+                width: 240 - (Styles.spaceBetween * 5) - 52,
                 child: PieChart(
                   PieChartData(
                     startDegreeOffset: -90,
@@ -104,13 +104,14 @@ class ActivityPanel extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: Styles.spaceBetween * 2),
+          Spacer(),
+
           Container(
             width: double.infinity,
             height: 52,
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.highlighted),
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: Styles.borderRadius,
             ),
             child: Row(
               children: [
@@ -174,11 +175,11 @@ class CurrencyPanel extends StatelessWidget {
           (_) => Container(
             height: 180,
             width: 230,
-            margin: const EdgeInsets.only(right: 12),
-            padding: Styles.bodyPadding,
+            margin: const EdgeInsets.only(right: Styles.spaceBetween),
+            padding: Styles.paddingAll * 1.2,
             decoration: BoxDecoration(
               color: AppColors.onBackground,
-              borderRadius: BorderRadius.circular(38),
+              borderRadius: Styles.borderRadiusLarge,
             ),
             child: Stack(
               children: [
@@ -247,7 +248,7 @@ class _StackCardsState extends State<StackCards> {
   bool _waitingAnimation = false;
 
   void _setPressed(bool value) {
-    if (_pressed == value) return;
+    if (_pressed == value || _waitingAnimation) return;
     setState(() {
       _pressed = value;
     });
@@ -326,9 +327,9 @@ class CardContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 76,
+      height: 80,
       width: double.infinity,
-      padding: Styles.bodyPadding,
+      padding: Styles.paddingAll,
       decoration: BoxDecoration(
         color: AppColors.onBackground,
         borderRadius: BorderRadius.circular(38),

@@ -7,6 +7,7 @@ class Pressable extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.pressedScale = 0.97,
+    this.brighten = false,
     this.brightnessDelta = 0.15, // 0..1
     this.duration = const Duration(milliseconds: 110),
     this.curve = Curves.easeOut,
@@ -17,6 +18,7 @@ class Pressable extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final double pressedScale;
+  final bool brighten;
   final double brightnessDelta;
   final Duration duration;
   final Curve curve;
@@ -54,7 +56,7 @@ class _PressableState extends State<Pressable> {
           fit: StackFit.passthrough,
           children: [
             widget.child,
-            if (widget.brightnessDelta > 0)
+            if (widget.brightnessDelta > 0 && widget.brighten)
               Positioned.fill(
                 child: AnimatedOpacity(
                   opacity: overlayOpacity,

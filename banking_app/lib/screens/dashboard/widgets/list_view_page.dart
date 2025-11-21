@@ -98,33 +98,81 @@ class ListViewPage extends AnimatedWidget {
   }
 }
 
-class _AnimatedCurrencyList extends StatelessWidget {
+class _AnimatedCurrencyList extends StatefulWidget {
   const _AnimatedCurrencyList({
     required this.animationValue,
     required this.cardInfoRenderBox,
     required this.bodyOffset,
   });
 
-  static const double _collapsedSeparatorHeight = 8;
-  static const double _extraSeparatorHeight = 500;
-
   final double animationValue;
   final RenderBox? cardInfoRenderBox;
   final Offset bodyOffset;
 
   @override
+  State<_AnimatedCurrencyList> createState() => _AnimatedCurrencyListState();
+}
+
+class _AnimatedCurrencyListState extends State<_AnimatedCurrencyList> {
+  static const double _collapsedSeparatorHeight = 8;
+  static const double _extraSeparatorHeight = 500;
+
+  final ScrollController _scrollController = ScrollController();
+  double _previousAnimationValue = 0;
+  bool _didResetOnReverse = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _previousAnimationValue = widget.animationValue;
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedCurrencyList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _handleAnimationProgress();
+  }
+
+  void _handleAnimationProgress() {
+    final currentValue = widget.animationValue;
+    final isReversing = currentValue < _previousAnimationValue;
+    final isForward = currentValue > _previousAnimationValue;
+
+    if (isReversing && !_didResetOnReverse && _scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeIn,
+      );
+      _didResetOnReverse = true;
+    } else if (isForward) {
+      _didResetOnReverse = false;
+    }
+
+    _previousAnimationValue = currentValue;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cardInfoTop =
-        cardInfoRenderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
-    final cardInfoLocalTop = cardInfoTop - bodyOffset;
+        widget.cardInfoRenderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+    final cardInfoLocalTop = cardInfoTop - widget.bodyOffset;
     final firstCardStartOffset =
         (cardInfoLocalTop.dy - topMargin - _collapsedSeparatorHeight);
-    final firstCardAnimatedOffset = firstCardStartOffset * (1 - animationValue);
+    final firstCardAnimatedOffset =
+        firstCardStartOffset * (1 - widget.animationValue);
 
     final separatorAnimatedAddition =
-        (1 - animationValue) * _extraSeparatorHeight;
+        (1 - widget.animationValue) * _extraSeparatorHeight;
 
     return ListView.builder(
+      controller: _scrollController,
       padding: EdgeInsets.only(bottom: 18),
       itemCount: 30,
       itemBuilder: (context, index) {

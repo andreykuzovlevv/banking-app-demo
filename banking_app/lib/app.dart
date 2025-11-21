@@ -1,7 +1,5 @@
 import 'package:banking_app/styles/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
-
 import 'screens/screens.dart';
 import 'widgets/anim_bottom_nav_bar.dart';
 
@@ -12,43 +10,62 @@ class BankingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Persistent Bottom Navigation Bar Demo',
+      title: 'Banking App',
       theme: ThemeData.dark(),
-      home: PersistentTabView(
-        backgroundColor: AppColors.background,
-        tabs: [
-          PersistentTabConfig(
-            screen: const DashboardScreen(),
-            item: ItemConfig(
-              // NOTE: icon here is ignored by our custom nav bar;
-              // we drive Lottie from the asset list below.
-              icon: SizedBox.shrink(),
-              title: "Dashboard",
-            ),
-          ),
-          PersistentTabConfig(
-            screen: const CardScreen(),
-            item: ItemConfig(icon: SizedBox.shrink(), title: "Card"),
-          ),
-          PersistentTabConfig(
-            screen: const AccountsScreen(),
-            item: ItemConfig(icon: SizedBox.shrink(), title: "Accounts"),
-          ),
-          PersistentTabConfig(
-            screen: const SavingsScreen(),
-            item: ItemConfig(icon: SizedBox.shrink(), title: "Savings"),
-          ),
-        ],
-        navBarBuilder: (cfg) => AnimatedBottomNavBar(
-          navBarConfig: cfg,
-          // Provide one asset per item, in order:
-          lottieAssets: const [
-            'assets/lottie_animations/home_white.json',
-            'assets/lottie_animations/card_white.json',
-            'assets/lottie_animations/wallet_white.json',
-            'assets/lottie_animations/piggy_white.json',
-          ],
-        ),
+      home: const _NavigationShell(),
+    );
+  }
+}
+
+class _NavigationShell extends StatefulWidget {
+  const _NavigationShell();
+
+  @override
+  State<_NavigationShell> createState() => _NavigationShellState();
+}
+
+class _NavigationShellState extends State<_NavigationShell> {
+  int _currentIndex = 0;
+
+  static const _screens = [
+    DashboardScreen(),
+    CardScreen(),
+    AccountsScreen(),
+    SavingsScreen(),
+  ];
+
+  static const _navItems = [
+    AnimatedNavItem(
+      title: 'Dashboard',
+      lottieAsset: 'assets/lottie_animations/home_white.json',
+    ),
+    AnimatedNavItem(
+      title: 'Card',
+      lottieAsset: 'assets/lottie_animations/card_white.json',
+    ),
+    AnimatedNavItem(
+      title: 'Accounts',
+      lottieAsset: 'assets/lottie_animations/wallet_white.json',
+    ),
+    AnimatedNavItem(
+      title: 'Savings',
+      lottieAsset: 'assets/lottie_animations/piggy_white.json',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: true,
+      backgroundColor: AppColors.background,
+      body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: AnimatedBottomNavBar(
+        items: _navItems,
+        selectedIndex: _currentIndex,
+        onItemSelected: (index) {
+          if (index == _currentIndex) return;
+          setState(() => _currentIndex = index);
+        },
       ),
     );
   }

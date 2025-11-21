@@ -1,3 +1,4 @@
+import 'package:banking_app/styles/styles.dart';
 import 'package:banking_app/widgets/pressable.dart';
 import 'package:flutter/material.dart';
 
@@ -5,7 +6,7 @@ class CircleIconButton extends StatelessWidget {
   const CircleIconButton({
     super.key,
     required this.icon,
-    this.iconSize = 40,
+    this.iconSize = Styles.circleRadius,
     this.label,
     this.backgroundColor = Colors.white24,
     this.showBadge = false,
@@ -26,20 +27,21 @@ class CircleIconButton extends StatelessWidget {
     return Pressable(
       pressedScale: pressedScale,
       onTap: onPressed,
+      brighten: false,
       child: Column(
-        spacing: 10,
+        spacing: Styles.spaceBetweenMedium,
         children: [
           Stack(
             clipBehavior: Clip.none,
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: Styles.circleSize,
+                height: Styles.circleSize,
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: Colors.white, size: iconSize),
+                child: Icon(icon, color: AppColors.white, size: iconSize),
               ),
 
               // Red badge (optional)
@@ -51,14 +53,15 @@ class CircleIconButton extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: AppColors.red,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
             ],
           ),
-          if (label != null && label!.isNotEmpty) Text(label!),
+          if (label != null && label!.isNotEmpty)
+            Text(label!, style: Styles.textRegular),
         ],
       ),
     );

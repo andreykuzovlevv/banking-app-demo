@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:banking_app/screens/dashboard/dashboard.dart';
 import 'package:banking_app/screens/dashboard/widgets/toggle_modes_button.dart';
+import 'package:banking_app/styles/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -22,7 +23,7 @@ const EdgeInsetsGeometry _kHorizontalItemPadding = EdgeInsets.symmetric(
 const Radius _kCornerRadius = Radius.circular(100);
 
 // Minimum height of the segmented control.
-const double _kMinSegmentedControlHeight = 60.0;
+const double _kMinSegmentedControlHeight = Styles.circleSize;
 
 const CupertinoDynamicColor _kThumbColor = CupertinoDynamicColor.withBrightness(
   color: Color(0xFFFFFFFF),

@@ -10,10 +10,10 @@ class AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: Styles.horizontalBodyPadding,
-      padding: Styles.cardPadding,
+      margin: Styles.horizontalPadding,
+      padding: Styles.paddingAll,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(38),
+        borderRadius: Styles.borderRadiusLarge,
         gradient: RadialGradient(
           colors: [
             const Color.fromARGB(255, 200, 209, 255),
@@ -36,14 +36,16 @@ class AccountCard extends StatelessWidget {
               CircleIconButton(
                 backgroundColor: AppColors.highlighted,
                 icon: CupertinoIcons.bell,
-                iconSize: 30,
+                iconSize: Styles.circleRadius,
                 showBadge: true,
               ), // Notifications Button
             ],
           ),
-          SizedBox(height: 30),
+          SizedBox(height: Styles.circleRadius),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: Styles.spaceBetweenMedium,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -51,13 +53,17 @@ class AccountCard extends StatelessWidget {
                   spacing: 6,
                   children: [
                     Text('Total balance', style: Styles.secondary),
-                    Icon(CupertinoIcons.eye, size: 18, color: Colors.grey),
+                    Icon(
+                      CupertinoIcons.eye,
+                      size: 18,
+                      color: AppColors.inactive,
+                    ),
                   ],
                 ),
                 UserBalance(),
-                SizedBox(height: 30),
+                SizedBox(height: Styles.circleRadius),
                 AccountOperations(),
-                SizedBox(height: 10),
+                SizedBox(height: Styles.spaceBetweenMedium),
               ],
             ),
           ),
@@ -73,11 +79,11 @@ class Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: 10,
+      spacing: Styles.spaceBetweenMedium,
       children: [
         Pressable(
           child: CircleAvatar(
-            radius: 30,
+            radius: Styles.circleRadius,
             foregroundImage: AssetImage('assets/img/butter_dog.jpg'),
             backgroundColor: Colors.deepOrangeAccent,
           ),
@@ -100,7 +106,7 @@ class UserBalance extends StatelessWidget {
 class AccountOperations extends StatelessWidget {
   const AccountOperations({super.key});
 
-  static const double _iconSize = 24;
+  static const double _iconSize = Styles.spaceBetween * 3;
 
   @override
   Widget build(BuildContext context) {
